@@ -28,12 +28,11 @@ library(DT) #For visualizing tables
 
 First, I pulled in the data from Morningstar Direct. (I combined it using “Combine_Files.r”). There were 24,971 rows and 89 columns. Data was pulled from Morningstar Direct on April 7, 2021.
 
-We repulled the data to replace the "Annual Report Adjusted Expense Ratio"  the "Annual Report Net Expense Ratio" figure previously used. [Here's why](https://www.morningstar.com/articles/969612/one-expense-ratio-to-rule-them-all).
+We use the "Annual Report Net Expense Ratio." [Here's why](https://www.morningstar.com/articles/969612/one-expense-ratio-to-rule-them-all).
 
 For the 2019 fee study from Morningstar the analyst says they used the lesser of Annual Report Net Expense Ratio and Annual Report Adjusted for each fund. "... adjusted excludes short interest, reverse repo rates, among other things that make it hard to compare fixed income and alt funds across firms. However, we didn’t JUST use adjusted because it’s not exhaustive of the whole universe we found – a handful of funds had missing adjusted expense ratios, but every one had a net expense ratio."
 
 ```{r load, message = FALSE}
-
 
 Full <- read_csv("data_combined.csv",
                  guess_max = 25000)
@@ -84,7 +83,7 @@ Adjusted_Data <- Full %>%
   )
 
 write_csv(Adjusted_Data,
-          "MF_Fee_Report_040721_ag.csv")
+          "~/Data/Fee_Data_2021/fee_data_2020/results/MF_Fee_Report_040721_ag.csv")
 
 ```
 
@@ -152,7 +151,7 @@ Active_Fees <- ActiveFunds %>%
   )
 
 write_csv(Active_Fees,
-          "fees_activefunds_firm.csv")
+          "~/Data/Fee_Data_2021/fee_data_2020/results/active/fees_activefunds_firm.csv")
 
 Active_HighFees <- Active_Fees %>%
   arrange(desc(Fee_Wted_2020)) %>%
@@ -184,7 +183,7 @@ ggplot(data = Active_LowFees, mapping = aes(x = reorder(Firm.Name.Mod,-Fee_Wted_
   scale_y_continuous(limits = c(0, 5)) +
   geom_text(aes(label = round(Fee_Wted_2019, 2)), hjust = -.5) +
   ggtitle("Funds shops with the lowest fees across active shareclasses") +
-  ylab("2019 Asset Weighted Fee") +
+  ylab("2020 Asset Weighted Fee") +
   xlab("Fund Family") +
   theme_classic()
 
@@ -192,7 +191,7 @@ ggplot(data = Active_LowFees, mapping = aes(x = reorder(Firm.Name.Mod,-Fee_Wted_
 
 ## Summary
 
-Here I calculate the industry average net expense ratio, on an asset weighted basis, for 2018, 2019 and 2020.
+Here I calculate the industry average net expense ratio, on an asset weighted basis for 2018, 2019 and 2020.
 
 I take **ActiveFunds**
 
@@ -208,6 +207,7 @@ Next steps:
 I drop the adjusted asset figures above and gather all the columns.
 
 ```{r active_funds_summary, Message=FALSE}
+
 Active_Summary <- ActiveFunds %>% 
   ungroup() %>%
   summarise(
@@ -235,7 +235,7 @@ Active_Summary <- ActiveFunds %>%
   )
 
 write_csv(Active_Summary,
-          "fees_activefunds_summary.csv")
+          "~/Data/Fee_Data_2021/fee_data_2020/results/active/fees_activefunds_summary.csv")
 
 datatable(Active_Summary)
 
@@ -243,7 +243,7 @@ datatable(Active_Summary)
 
 ## Fees by Type of Active Fund Category
 
-Here I am looking at fund families' fees for each U.S. category types for active funds. I start by pulling in the filtered data from **ActiveFunds**.
+Here I look at fund families' fees for each U.S. category types for active funds. I pull in the filtered data from **ActiveFunds**.
 
 Next steps:
 
@@ -292,7 +292,7 @@ Active_Cat <- ActiveFunds %>%
     )
 
 write_csv(Active_Cat,
-          "cat_activefunds_firm.csv")
+          "~/Data/Fee_Data_2021/fee_data_2020/results/active/cat_activefunds_firm.csv")
 
 Active_Cat_Sum <- Active_Cat %>%
   group_by(US.Category.Group) %>%  
@@ -331,7 +331,7 @@ Active_Cat_Pct <- Active_Cat %>%
   arrange(-Fee_Wted_2020, .by_group = TRUE)
 
 write_csv(Active_Cat_Pct,
-          "cat_activefunds_highlow.csv")
+          "~/Data/Fee_Data_2021/fee_data_2020/results/active/cat_activefunds_highlow.csv")
 
 ```
 
@@ -460,7 +460,7 @@ Active_MSCat <- ActiveFunds %>%
   )
 
 write_csv(Active_MSCat,
-          "MScat_activefunds.csv")
+          "~/Data/Fee_Data_2021/fee_data_2020/results/active/MScat_activefunds.csv")
 
 
 Active_MSCat_Sum <- Active_MSCat %>%
@@ -495,7 +495,7 @@ Active_MSCat_Pct <- Active_MSCat %>%
   arrange(-Fee_Wted_2020, .by_group = TRUE)
 
 write_csv(Active_MSCat_Pct,
-          "MScat_activefunds_highlow.csv")
+          "~/Data/Fee_Data_2021/fee_data_2020/results/active/MScat_activefunds_highlow.csv")
 
 ```
 
@@ -558,13 +558,14 @@ Active_Summary_Shareclass <- Active_Shareclass %>%
 
 write_csv(
   Active_Summary_Shareclass,
-  "shareclass_changes_activefunds.csv"
+  "~/Data/Fee_Data_2021/fee_data_2020/results/active/shareclass_changes_activefunds.csv"
   )
 ```
 
 Here's a look at some of the above data. Full results saved as **shareclass_changes_activefunds.csv** in **Results** folder.
 
 ```{r active_shareclass_show, echo = FALSE}
+
 Active_Summary_Shareclass %>%
   filter(FeeChange == "Cut") %>%
   arrange(desc(count)) %>%
@@ -586,7 +587,7 @@ Active_Summary_Shareclass %>%
 
 ## Fund families with the lowest/highes fees across passive products
 
-Here I am looking at the fund families with the lowest and highest overall fees across passive products. I start by filtering out non-index funds and removing fees that are NA (blank) for 2020. 1,060 rows remain.
+Here I look at the fund families with the lowest and highest overall fees across passive products. I start by filtering out non-index funds and removing fees that are NA (blank) for 2020. 1,060 rows remain.
 
 Filter:
 
@@ -727,7 +728,7 @@ Passive_Summary <- PassiveFunds %>%
   )
 
 write_csv(Passive_Summary,
-          "fees_activefunds_summary.csv")
+          "~/Data/Fee_Data_2021/fee_data_2020/results/passive/fees_activefunds_summary.csv")
 
 datatable(Passive_Summary)
 
@@ -763,7 +764,7 @@ Passive_Fees_Past <- PassiveFunds_Past %>%
 
 write_csv(
   Passive_Fees_Past,
-  "past_fees_passivefunds_firm.csv"
+  "~/Data/Fee_Data_2021/fee_data_2020/results/passive/past_fees_passivefunds_firm.csv"
 )
 
 
@@ -779,7 +780,7 @@ Passive_LowFees_Past %>%
   select(1:4,
          6:7,
          5, 8) %>%
-  write_csv("past_lowfees_passivefunds_firm.csv")
+  write_csv("~/Data/Fee_Data_2021/fee_data_2020/results/passive/past_lowfees_passivefunds_firm.csv")
 ```
 
 ## Fees by Type of Passive Fund Holdings
@@ -859,7 +860,7 @@ Passive_Cat_Pct <- Passive_Cat %>%
   group_by(Firm.Name.Mod) %>% 
   arrange(-pct_assets, .by_group = TRUE)
 
-  write_csv(Passive_Cat_Pct, "passivefunds_firm_category.csv")
+  write_csv(Passive_Cat_Pct, "~/Data/Fee_Data_2021/fee_data_2020/results/passive/passivefunds_firm_category.csv")
 
 
 ```
@@ -867,6 +868,7 @@ Passive_Cat_Pct <- Passive_Cat %>%
 
 
 ```{r show_passive_cat_pct, echo = FALSE}
+
   ggplot(data = Passive_Cat_Pct, 
          aes(fill = US.Category.Group, values = pct_assets)) +
   geom_waffle(colour = "white",
@@ -877,6 +879,7 @@ Passive_Cat_Pct <- Passive_Cat %>%
   theme_enhance_waffle() +
   labs(title = "Type of Holdings in Passive Funds",
        subtitle = "% of assets in each category type")
+
 ```
 
 ## Fees by Share Class of Passive Fund Holdings
@@ -978,7 +981,7 @@ Passive_Summary_Shareclass <- Passive_Shareclass %>%
 
 write_csv(
   Passive_Summary_Shareclass,
-  "shareclass_changes_passivefunds.csv"
+  "~/Data/Fee_Data_2021/fee_data_2020/results/passive/shareclass_changes_passivefunds.csv"
   )
 
 ```
@@ -1069,6 +1072,7 @@ Here I at look how deep firms slashed their expense ratios from 2019 to 2020. Fi
 Now I need to put the percent change in fees from 2019 to 2020 into buckets. I did that with the cut() function. Here’s a [link](https://rpubs.com/pierrelafortune/cutdocumentation) for personal reference. 
 
 ```{r category, Message=FALSE}
+
 Category <- Adjusted_Data %>%
   select(1:20,
          everything()) %>%
@@ -1089,18 +1093,20 @@ Category <- Adjusted_Data %>%
   )
 
 write_csv(Category,
-          "shareclass_cuts_total.csv")
+          "~/Data/Fee_Data_2021/fee_data_2020/results/shareclass_cuts_total.csv")
 
 Summary_Category <- Category %>%
   group_by(FeeChange) %>%
   summarise(count = n())
 
 datatable(Summary_Category)
+
 ```
 
 Here's a look at the above data. Full results saved as **shareclass_cuts_total.csv** in **Results** folder.
 
 ```{r category_show, echo = FALSE}
+
 ggplot(data = Summary_Category, mapping = aes(x = FeeChange, y = count)) +
   geom_bar(stat = "identity", fill = "black") +
   scale_y_continuous(limits = c(0, 10000)) +
@@ -1108,4 +1114,5 @@ ggplot(data = Summary_Category, mapping = aes(x = FeeChange, y = count)) +
   ggtitle("% change of share class fees from 2020 to 2020") +
   xlab("% change") +
   theme_classic()
+
 ```
