@@ -64,6 +64,7 @@ Adjusted_Data <- Full %>%
       Firm.Name == "Nuveen" ~ "TIAA Investments",
       Firm.Name %in% c("Harding Loevner", "Third Avenue", "Tweedy, Browner") ~ "AMG Funds",
       Firm.Name %in% "Amundi Pioneer" ~ "Pioneer Investments",
+      grepl("AllianzGI", Name) ~ "AllianzGI_",
       TRUE ~ as.character(Firm.Name)
     )
   ) %>%
@@ -177,7 +178,7 @@ ggplot(data = Active_HighFees, mapping = aes(x = reorder(Firm.Name.Mod, Fee_Wted
   xlab("Fund Family") +
   theme_classic()
 
-ggplot(data = Active_LowFees, mapping = aes(x = reorder(Firm.Name.Mod,-Fee_Wted_2019), y = Fee_Wted_2019)) +
+ggplot(data = Active_LowFees, mapping = aes(x = reorder(Firm.Name.Mod,-Fee_Wted_2020), y = Fee_Wted_2020)) +
   geom_bar(stat = "identity", fill = "black") +
   coord_flip() +
   scale_y_continuous(limits = c(0, 5)) +
