@@ -137,17 +137,30 @@ ActiveFunds1 <- ActiveFunds %>%
       Fee_Wted_2020 = Sum_Assts_Wted_2020 / Sum_Assets_2020
     )
   
-  Rowe <- PassiveFunds %>% 
+  VIRTUS <- ActiveFunds %>% 
     filter(
-      grepl("Rowe", Firm.Name.Mod)
+      grepl("Virtus", Firm.Name.Mod)
         ) %>%
+    mutate(CHANGE = Annual.Report..Net.Expense..Ratio..Year2020 - Annual.Report..Net.Expense..Ratio..Year2019) %>% 
+    select(CHANGE, everything())
+    
+    
     group_by(Name) %>% 
     mutate(PCT = (Annual.Report.Adjusted.Expense.Ratio..Year2020 - Annual.Report.Adjusted.Expense.Ratio..Year2019)) %>% 
-    select(Name, PCT, everything()) %>% 
-    arrange(desc(Net.Assets...share.class..Monthly...2020.12..USD)) %>% 
-    group_by(Firm.Name.Mod) %>% 
-    summarise(FLW_2020 = sum(Estimated.Share.Class.Net.Flow..Yearly...Year2020..USD, na.rm = T))
+    select(Name, PCT, Estimated.Share.Class.Net.Flow..Yearly...Year2020..USD, everything()) %>% 
+    arrange(desc(Estimated.Share.Class.Net.Flow..Yearly...Year2020..USD))
   
+  
+  ggplot(data = Passive_LowFees, mapping = aes(x = reorder(Firm.Name.Mod,-Fee_Wted_2019), y = Fee_Wted_2019)) +
+    geom_bar(stat = "identity", fill = "black") +
+    coord_flip() +
+    scale_y_continuous(limits = c(0, 5)) +
+    geom_text(aes(label = round(Fee_Wted_2019, 2)), hjust = -.5) +
+    ggtitle("Funds shops with the lowest fees across passive shareclasses") +
+    ylab("2020 Asset Weighted Fee") +
+    xlab("Fund Family") +
+    theme_classic() +
+    theme(plot.title = element_text(size = 11, face = "bold"))
   
   Hmm <- PassiveFunds %>%  
     filter(Annual.Report.Adjusted.Expense.Ratio..Year2020 == 0)
@@ -155,12 +168,11 @@ ActiveFunds1 <- ActiveFunds %>%
   Hmm <- ActiveFunds %>%  
     filter(Annual.Report.Adjusted.Expense.Ratio..Year2020 == 0)
 
-  Passive_LowFees <- Passive_Fees %>%
+  Active_LowFees <- Active_Fees %>%
     arrange(Fee_Wted_2020) %>%
     top_n(-10, Fee_Wted_2020) %>% 
     mutate(
-      Pct_Change = (Fee_Wted_2020-Fee_Wted_2019)/Fee_Wted_2019 *100
-    )
+      Pct_Change = (Fee_Wted_2020-Fee_Wted_2019))
   
   Lowcost_Passive <- Passive_LowFees$Firm.Name.Mod
   
@@ -170,6 +182,13 @@ ActiveFunds1 <- ActiveFunds %>%
     #   ) %>% 
     group_by(Firm.Name.Mod) %>% 
     summarise(FLW_2020 = sum(Estimated.Share.Class.Net.Flow..Yearly...Year2020..USD, na.rm = T))
+  
+  
+  RANK <- Active_MSCat %>% 
+    group_by(Morningstar.Category) %>% 
+    mutate(RANK = rank(Fee_Wted_Cat_2020)) %>% 
+    select(Morningstar.Category, Fee_Wted_Cat_2020, RANK, everything()) %>% 
+    arrange(Morningstar.Category, RANK)
   
   # Adjusted_Data <- Full %>%
   #   rename_all(make.names) %>%

@@ -326,9 +326,9 @@ Active_Cat_Pct <- Active_Cat %>%
              grepl("Bond", US.Category.Group) ~ "Bond",
              TRUE ~ "Other"
            )) %>%
-  filter(Firm.Name.Mod %in% Lowcost_Active_Firms |
-           Firm.Name.Mod %in% Highcost_Active_Firms) %>%
-  group_by(Firm.Name.Mod) %>%
+  # filter(Firm.Name.Mod %in% Lowcost_Active_Firms |
+  #          Firm.Name.Mod %in% Highcost_Active_Firms) %>%
+  # group_by(Firm.Name.Mod) %>%
   arrange(-Fee_Wted_2020, .by_group = TRUE)
 
 write_csv(Active_Cat_Pct,
@@ -911,7 +911,7 @@ write_csv(Passive_MSCat,
           "~/Data/Fee_Data_2021/fee_data_2020/results/passive/MScat_passivefunds.csv")
 
 
-Passive_MSCat_Sum <- Active_MSCat %>%
+Passive_MSCat_Sum <- Passive_MSCat %>%
   group_by(Morningstar.Category) %>%  
   summarise(
     SHARECLASSES = sum(Cat_Count),
